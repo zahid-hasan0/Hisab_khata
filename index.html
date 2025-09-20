@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="shortcut icon" href="./logo.png" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+  <title>ট্যালি খাতা</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: #121212;
+      color: #eee;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      /* padding: 15px; */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    h1, h2, h3 {
+      font-weight: 700;
+    }
+    h1 {
+      font-size: 2.2rem;
+      text-align: center;
+      margin-bottom: 15px;
+      letter-spacing: 1.1px;
+    }
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+    h3 {
+      font-size: 1.1rem;
+      color: #bbb;
+      margin-bottom: 5px;
+    }
+
+    button {
+      cursor: pointer;
+      user-select: none;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+      background-color: #ef5350;
+      color: white;
+      box-shadow: 0 2px 5px rgba(239,83,80,0.7);
+    }
+    button:hover:not(:disabled) {
+      background-color: #d43e3a;
+    }
+    button:disabled {
+      background-color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ======== Container ======== */
+    #home{
+      padding: 10px;
+    }
+    #home, #user-detail {
+      max-width: 365px;
+      margin: 0 auto;
+      background: #1a1a1a;
+      border-radius: 14px;
+      box-shadow: 0 0 15px #000;
+      padding: 25px 5px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ======== Summary Boxes ======== */
+    #totals {
+      display: flex;
+      width:  360px;
+      /* border: 1px solid red; */
+      margin-bottom: 25px;
+      gap: 15px;
+    }
+    .total-box {
+       width: 170px;
+      background: #222;
+      padding: 10px 10px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: inset 0 0 8px #000;
+      user-select: none;
+    }
+    .total-box h3 {
+      color: #ddd;
+      margin-bottom: 8px;
+      font-weight: 300;
+    }
+    .total-box p {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    #total-owe p {
+      color: #ef5350;
+    }
+    #total-get p {
+      color: #4caf50;
+    }
+
+    /* ======== Add User Section ======== */
+    #add-user-section {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    #add-user-section input {
+      /* flex-grow: 1; */
+      padding: 12px 15px;
+      border-radius: 12px 0 0 12px;
+      border: none;
+      font-size: 1rem;
+      background: #222;
+      color: #eee;
+      outline-offset: 2px;
+      outline-color: transparent;
+      transition: outline-color 0.3s ease;
+    }
+    #add-user-section input:focus {
+      outline-color: #ef5350;
+    }
+    #add-user-section button {
+      min-width: 130px;
+      border-radius: 0 12px 12px 0;
+      box-shadow: 0 2px 6px rgba(239,83,80,0.8);
+    }
+
+    /* ======== Tables ======== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 10px #000;
+      background: #222;
+      margin-bottom: 15px;
+    }
+    thead {
+      background: #333;
+      user-select: none;
+    }
+    thead th {
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: 600;
+      color: #ddd;
+    }
+    tbody tr {
+      border-bottom: 1px solid #333;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    tbody tr:hover {
+      background-color: #2b2b2b;
+    }
+    tbody td {
+      padding: 12px 15px;
+      vertical-align: middle;
+      color: #eee;
+      font-weight: 600;
+    }
+    tbody td.amount-get {
+      color: #4caf50;
+    }
+    tbody td.amount-owe {
+      color: #ef5350;
+    }
+    tbody td.actions {
+      text-align: right;
+      width: 60px;
+      cursor: default;
+    }
+    tbody td.actions button {
+      background-color: transparent;
+      box-shadow: none;
+      padding: 4px;
+      font-size: 1.2rem;
+      color: #ef5350;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      user-select: none;
+    }
+    tbody td.actions button:hover {
+      color: #d43e3a;
+    }
+
+    /* ======== User List ======== */
+    #user-list {
+      max-height: 320px;
+      overflow-y: auto;
+      border-radius: 12px;
+    }
+
+    /* ======== User Detail Header ======== */
+    #user-detail{
+          padding: 10px;
+    }
+
+    #user-detail header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      
+    }
+    #user-detail header h2 {
+      margin: 0;
+      font-size: 1.9rem;
+      user-select: none;
+    }
+    #user-detail header button#back-btn {
+      background-color: #777;
+      box-shadow: none;
+      padding: 8px 15px;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    #user-detail header button#back-btn:hover {
+      background-color: #555;
+    }
+
+    /* Delete user button icon */
+    #delete-user-btn {
+      background-color: transparent;
+      border: none;
+      color: #ef5350;
+      font-size: 1.7rem;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.3s ease;
+      padding: 0 6px;
+      line-height: 1;
+    }
+    #delete-user-btn:hover {
+      color: #d43e3a;
+    }
+
+    /* ======== Transaction Form ======== */
+    #transaction-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+    #transaction-form select,
+    #transaction-form input[type="number"],
+    #transaction-form input[type="date"] {
+      
+      padding: 10px;
+      background: #222;
+      color: #eee;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      font-size: 1rem;
+      outline-offset: 2px;
+      outline-color: transparent;
+      transition: outline-color 0.3s ease;
+    }
+    #transaction-form select:focus,
+    #transaction-form input[type="number"]:focus,
+    #transaction-form input[type="date"]:focus {
+      outline-color: #4caf50;
+    }
+    #transaction-form button {
+      flex: 1 1 120px;
+      background: #4caf50;
+      color: white;
+      font-weight: 700;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(76,175,80,0.8);
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    #transaction-form button:hover {
+      background-color: #388e3c;
+    }
+
+    /* ======== Notification ======== */
+    #notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 250px;
+      max-width: 90vw;
+      padding: 15px 24px;
+      border-radius: 30px;
+      font-weight: 700;
+      color: white;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      z-index: 9999;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    }
+    #notification.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+    #notification.success {
+      background-color: #4caf50;
+    }
+    #notification.error {
+      background-color: #ef5350;
+    }
+
+    /* ======== Modal Popup ======== */
+    #modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    #modal-overlay.show {
+      display: flex;
+    }
+    #modal {
+      background: #1a1a1a;
+      padding: 25px 30px;
+      border-radius: 14px;
+      max-width:  375px;
+      width: 90%;
+      box-shadow: 0 0 15px #000;
+      text-align: center;
+      color: #eee;
+      user-select: none;
+    }
+    #modal p {
+      font-size: 1.2rem;
+      margin-bottom: 25px;
+    }
+    #modal button {
+      min-width: 110px;
+      margin: 0 10px;
+      font-weight: 700;
+    }
+    #modal button.confirm {
+      background-color: #ef5350;
+      box-shadow: 0 2px 6px rgba(239,83,80,0.8);
+      margin-bottom: 10px;
+    }
+    #modal button.confirm:hover {
+      background-color: #d43e3a;
+    }
+    #modal button.cancel {
+      background-color: #555;
+      box-shadow: none;
+    }
+    #modal button.cancel:hover {
+      background-color: #444;
+    }
+
+    /* ======== Responsive ======== */
+    @media (max-width: 375px) {
+      #add-user-section {
+        flex-direction: column;
+      }
+      #add-user-section input {
+        border-radius: 12px 12px 0 0;
+      }
+      #add-user-section button {
+        border-radius: 0 0 12px 12px;
+        margin-top: 5px;
+      }
+       /* #transaction-form {
+        flex-direction: column; 
+      } */
+      #transaction-form button {
+        flex: none;
+        width: 100%;
+      }
+      #totals {
+        flex-direction: row;
+      }
+      .total-box {
+        margin-bottom: 12px;
+       
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>ট্যালি খাতা</h1>
+  <main id="home">
+    <div id="totals">
+      <div id="total-owe" class="total-box">
+        <h3> বাকি</h3>
+        <p>৳ 0</p>
+      </div>
+      <div id="total-get" class="total-box">
+        <h3> পাওনা</h3>
+        <p>৳ 0</p>
+      </div>
+    </div>
+
+    <div id="add-user-section">
+      <input type="text" id="add-user" placeholder="ব্যবহারকারীর নাম লিখুন..." autocomplete="off" />
+      <button id="add-user-btn">যোগ করুন</button>
+    </div>
+
+    <div id="user-list-container">
+      <table id="user-list" aria-label="ব্যবহারকারীদের তালিকা">
+        <thead>
+          <tr>
+            <th>নাম</th>
+            <th>বাকি </th>
+            <th>পাওনা </th>
+            <th>অ্যাকশন</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- User rows here -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <main id="user-detail" class="hidden" aria-live="polite" aria-atomic="true">
+    <header>
+      <h2 id="user-name">ব্যবহারকারী</h2>
+      <div>
+        <button id="back-btn" aria-label="পেছনে যান">পেছনে যান</button>
+        <button id="delete-user-btn" title="ব্যবহারকারী মুছুন" aria-label="ব্যবহারকারী মুছুন">&times;</button> 
+      </div>
+    </header>
+
+    <form id="transaction-form" aria-label="লেনদেনের ফর্ম">
+      <select id="transaction-type" aria-label="লেনদেনের ধরণ">
+        <option value="get">পাওনা</option>
+        <option value="owe">বাকি</option>
+      </select>
+      <input
+        type="number"
+        id="transaction-amount"
+        placeholder="টাকার পরিমাণ"
+        min="1"
+        aria-label="টাকার পরিমাণ"
+        required
+      />
+      <input type="date" id="transaction-date" aria-label="তারিখ" required />
+      <button type="submit">যোগ করুন</button>
+    </form>
+
+    <table id="transaction-list" aria-label="লেনদেনের তালিকা">
+      <thead>
+        <tr>
+          <th>পরিমাণ</th>
+          <th>তারিখ</th>
+          <th>অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Transaction rows here -->
+      </tbody>
+    </table>
+  </main>
+
+  <!-- Notification -->
+  <div id="notification" role="alert" aria-live="assertive"></div>
+
+  <!-- Modal for confirm delete user -->
+  <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+    <div id="modal">
+      <p id="modal-desc">আপনি কি নিশ্চিত ?</p>
+      <button class="confirm" id="modal-confirm-btn">মুছুন</button>
+      <br>
+      <button class="cancel" id="modal-cancel-btn">বাতিল করুন</button>
+    </div>
+  </div>
+<footer style="text-align: center; padding: 10px; font-size: 14px; color: #cdcbcb;background-color: black;">
+  Created by Md Zahid Hasan
+</footer>
+
+
+ 
+    <script>
+ 
+  // DOM Elements
+  const addUserInput = document.getElementById('add-user');
+  const addUserBtn = document.getElementById('add-user-btn');
+  const userListTbody = document.querySelector('#user-list tbody');
+  const homeSection = document.getElementById('home');
+  const userDetailSection = document.getElementById('user-detail');
+  const userNameTitle = document.getElementById('user-name');
+  const backBtn = document.getElementById('back-btn');
+  const deleteUserBtn = document.getElementById('delete-user-btn');
+  const transactionForm = document.getElementById('transaction-form');
+  const transactionTypeSelect = document.getElementById('transaction-type');
+  const transactionAmountInput = document.getElementById('transaction-amount');
+  const transactionDateInput = document.getElementById('transaction-date');
+  const transactionListTbody = document.querySelector('#transaction-list tbody');
+  const totalOwe = document.querySelector('#total-owe p');
+  const totalGet = document.querySelector('#total-get p');
+  const notification = document.getElementById('notification');
+
+  const modalOverlay = document.getElementById('modal-overlay');
+  const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+  const modalCancelBtn = document.getElementById('modal-cancel-btn');
+
+  // Data Model
+  let users = [];
+  let currentUserId = null;
+  let userIdToDelete = null;
+  let txToDelete = { userId: null, txId: null };
+
+  // LocalStorage Functions
+  function saveToLocalStorage() {
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+
+  function loadFromLocalStorage() {
+    const data = localStorage.getItem('users');
+    if (data) {
+      users = JSON.parse(data);
+    }
+  }
+
+  // Utility functions
+  function showNotification(message, type = 'success') {
+    notification.textContent = message;
+    notification.className = '';
+    notification.classList.add(type === 'error' ? 'error' : 'success', 'show');
+    setTimeout(() => {
+      notification.classList.remove('show');
+    }, 3000);
+  }
+
+  function generateId() {
+    return '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    if (isNaN(date)) return dateStr;
+    return date.toLocaleDateString('bn-BD', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  function formatAmount(amount) {
+    return `৳ ${amount.toLocaleString('bn-BD')}`;
+  }
+
+  function calculateTotals() {
+    let oweTotal = 0;
+    let getTotal = 0;
+    users.forEach(user => {
+      user.transactions.forEach(tx => {
+        if (tx.type === 'owe') oweTotal += tx.amount;
+        else if (tx.type === 'get') getTotal += tx.amount;
+      });
+    });
+    totalOwe.textContent = formatAmount(oweTotal);
+    totalGet.textContent = formatAmount(getTotal);
+  }
+
+  function renderUserList() {
+    userListTbody.innerHTML = '';
+    if (users.length === 0) {
+      userListTbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888; font-weight: 500;">কোনো ব্যবহারকারী নেই</td></tr>`;
+      return;
+    }
+    users.forEach(user => {
+      let oweAmount = 0;
+      let getAmount = 0;
+      user.transactions.forEach(tx => {
+        if (tx.type === 'owe') oweAmount += tx.amount;
+        else if (tx.type === 'get') getAmount += tx.amount;
+      });
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="user-name-cell" style="color:#4caf50; cursor:pointer;">${user.name}</td>
+        <td class="amount-owe">${formatAmount(oweAmount)}</td>
+        <td class="amount-get">${formatAmount(getAmount)}</td>
+        <td class="actions"><button aria-label="ব্যবহারকারী মুছুন" data-userid="${user.id}" title="ব্যবহারকারী মুছুন">&times;</button></td>  
+      `;
+
+      tr.querySelector('.user-name-cell').addEventListener('click', () => {
+        openUserDetail(user.id);
+      });
+
+      tr.querySelector('button').addEventListener('click', (e) => {
+        e.stopPropagation();
+        confirmUserDelete(user.id);
+      });
+
+      userListTbody.appendChild(tr);
+    });
+  }
+
+  function setTodayDate() {
+    const today = new Date().toISOString().split('T')[0];
+    transactionDateInput.value = today;
+  }
+
+  function openUserDetail(userId) {
+    currentUserId = userId;
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+
+    userNameTitle.textContent = user.name;
+    transactionTypeSelect.value = 'get';
+    transactionAmountInput.value = '';
+    setTodayDate();
+
+    renderTransactionList(user);
+    homeSection.classList.add('hidden');
+    userDetailSection.classList.remove('hidden');
+      const deleteBtn = document.getElementById('delete-user-btn');
+  if (deleteBtn) {
+    deleteBtn.style.display = 'none';}
+
+  }
+
+  function renderTransactionList(user) {
+    transactionListTbody.innerHTML = '';
+    if (user.transactions.length === 0) {
+      transactionListTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888; font-weight: 500;">কোনো লেনদেন নেই</td></tr>`;
+      return;
+    }
+
+    user.transactions.forEach(tx => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="${tx.type === 'owe' ? 'amount-owe' : 'amount-get'}">${formatAmount(tx.amount)}</td>
+        <td>${formatDate(tx.date)}</td>
+        <td class="actions"><button aria-label="লেনদেন মুছুন" data-txid="${tx.id}" title="লেনদেন মুছুন">&times;</button></td>
+      `;
+
+      tr.querySelector('button').addEventListener('click', () => {
+        txToDelete = { userId: user.id, txId: tx.id };
+        modalOverlay.classList.add('show');
+        modalConfirmBtn.focus();
+      });
+
+      transactionListTbody.appendChild(tr);
+    });
+  }
+
+  function addUser(name) {
+    name = name.trim();
+    if (!name) {
+      showNotification('ব্যবহারকারীর নাম দিতে হবে', 'error');
+      return;
+    }
+    if (users.some(u => u.name.toLowerCase() === name.toLowerCase())) {
+      showNotification('এই নাম ইতিমধ্যে আছে', 'error');
+      return;
+    }
+    const newUser = {
+      id: generateId(),
+      name: name,
+      transactions: []
+    };
+    users.push(newUser);
+    saveToLocalStorage();
+    addUserInput.value = '';
+    renderUserList();
+    calculateTotals();
+    showNotification('ব্যবহারকারী সফলভাবে যোগ হয়েছে');
+  }
+
+  function addTransaction(userId, type, amount, date) {
+    const user = users.find(u => u.id === userId);
+    if (!user) {
+      showNotification('ব্যবহারকারী পাওয়া যায়নি', 'error');
+      return;
+    }
+    amount = Number(amount);
+    if (isNaN(amount) || amount <= 0) {
+      showNotification('সঠিক পরিমাণ লিখুন', 'error');
+      return;
+    }
+    if (!date) {
+      showNotification('তারিখ নির্বাচন করুন', 'error');
+      return;
+    }
+    const newTx = {
+      id: generateId(),
+      type,
+      amount,
+      date
+    };
+    user.transactions.push(newTx);
+    saveToLocalStorage();
+    renderTransactionList(user);
+    calculateTotals();
+     renderUserList();   
+    showNotification('লেনদেন যোগ হয়েছে');
+  }
+
+  function deleteTransaction(userId, txId) {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+    user.transactions = user.transactions.filter(tx => tx.id !== txId);
+    saveToLocalStorage();
+    renderTransactionList(user);
+    calculateTotals();
+     renderUserList();   
+    showNotification('লেনদেন মুছে ফেলা হয়েছে');
+  }
+
+  function confirmUserDelete(userId) {
+    userIdToDelete = userId;
+    modalOverlay.classList.add('show');
+    modalConfirmBtn.focus();
+  }
+
+  function deleteUser(userId) {
+    users = users.filter(u => u.id !== userId);
+    saveToLocalStorage();
+    renderUserList();
+    calculateTotals();
+    showNotification('ব্যবহারকারী মুছে ফেলা হয়েছে');
+  }
+
+  // Event Listeners
+  addUserBtn.addEventListener('click', () => {
+    addUser(addUserInput.value);
+  });
+
+  addUserInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      addUser(addUserInput.value);
+    }
+  });
+
+  backBtn.addEventListener('click', () => {
+    currentUserId = null;
+    homeSection.classList.remove('hidden');
+    userDetailSection.classList.add('hidden');
+  });
+
+  deleteUserBtn.addEventListener('click', () => {
+    confirmUserDelete(currentUserId);
+  });
+
+  transactionForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const type = transactionTypeSelect.value;
+    const amount = transactionAmountInput.value;
+    const date = transactionDateInput.value;
+    addTransaction(currentUserId, type, amount, date);
+    transactionAmountInput.value = '';
+    setTodayDate();
+  });
+
+  modalCancelBtn.addEventListener('click', () => {
+    modalOverlay.classList.remove('show');
+    userIdToDelete = null;
+    txToDelete = { userId: null, txId: null };
+  });
+
+  modalConfirmBtn.addEventListener('click', () => {
+    if (userIdToDelete) {
+      deleteUser(userIdToDelete);
+      userIdToDelete = null;
+      if (!homeSection.classList.contains('hidden')) {
+        renderUserList();
+      } else {
+        backBtn.click();
+      }
+    } else if (txToDelete.userId && txToDelete.txId) {
+      deleteTransaction(txToDelete.userId, txToDelete.txId);
+      txToDelete = { userId: null, txId: null };
+    }
+    modalOverlay.classList.remove('show');
+  });
+
+  // Initial Load
+  loadFromLocalStorage();
+  renderUserList();
+  calculateTotals();
+ 
+
+</script>
+
+
+
+  </script>
+</body>
+</html>
